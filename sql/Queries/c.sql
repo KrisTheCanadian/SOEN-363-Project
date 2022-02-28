@@ -1,4 +1,4 @@
-SELECT genre
+SELECT genre, count as numberOfMovies
 FROM (
     SELECT genre, COUNT(movies.title) as count
     FROM movies, genres

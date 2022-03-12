@@ -107,7 +107,7 @@ SELECT age_gap.mid,
            (COALESCE(ct.result, 0)) ) / 5 AS DECIMAL(10, 3)
         ) AS similarity
 FROM age_gap
-    FULL OUTER JOIN rating_gap rg ON rg.mid = age_gap.mid
+    FULL OUTER JOIN rating_gap rg ON age_gap.mid = rg.mid
     FULL OUTER JOIN common_genres cg ON age_gap.mid = cg.mid
     FULL OUTER JOIN common_actors ca on age_gap.mid = ca.mid
     FULL OUTER JOIN common_tags ct on age_gap.mid = ct.mid;

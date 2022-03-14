@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW most_popular AS
+CREATE MATERIALIZED VIEW most_popular_mat AS
 SELECT a1.name, count( DISTINCT a2.name) as coactors
 FROM actors a1, actors a2
 WHERE a1.mid = a2.mid

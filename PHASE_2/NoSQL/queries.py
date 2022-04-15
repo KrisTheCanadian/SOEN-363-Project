@@ -6,7 +6,48 @@ from elasticsearch import Elasticsearch
 def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
-    query4(es)
+    query1(es)
+
+
+def query1(es: Elasticsearch):
+    """
+    What is the percentage of comments with the word sorry in them and are also replying to another comment?
+    :param es: Elastic Search API
+    """
+    indices = list(es.indices.get_alias().keys())
+    top_comments = []
+    query = {
+        "query_string": {
+            "query": "*"
+        }
+    }
+    sort = [
+        {
+            "score": {
+                "unmapped_type": "keyword",
+                "order": "desc"
+            }
+        }
+    ]
+    res = es.search(
+        index=indices,
+        query=query,
+        sort=sort,
+        size=10
+    )
+    comments = res.body["hits"]["hits"]
+    for comment in comments:
+        data = comment["_source"]
+        if len(top_comments) < 10:
+            top_comments.append(data)
+            continue
+        for top_comment in top_comments:
+            if top_comment["score"] < data["score"]:
+                top_comments.remove(top_comment)
+                top_comments.append(data)
+    for top_comment in top_comments:
+        print(f"Score {top_comment['score']} \n comment: {top_comment['body']}")
+        print(f"=================================")
 
 
 def query4(es: Elasticsearch):

@@ -6,12 +6,12 @@ from elasticsearch import Elasticsearch
 def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
-    query1(es)
+    query2(es)
 
 
 def query1(es: Elasticsearch):
     """
-    What is the percentage of comments with the word sorry in them and are also replying to another comment?
+    What are the top 10 most upvoted comments of all time? Print the comment and the score in an ordered list.
     :param es: Elastic Search API
     """
     indices = list(es.indices.get_alias().keys())
@@ -48,6 +48,58 @@ def query1(es: Elasticsearch):
     for top_comment in top_comments:
         print(f"Score {top_comment['score']} \n comment: {top_comment['body']}")
         print(f"=================================")
+
+
+def query2(es: Elasticsearch):
+    """
+    How many of the comments listed as controversial are also listed as an edited comment?
+    :param es: Elastic Search API
+    """
+    indices = list(es.indices.get_alias().keys())
+    query = {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "controversiality": 1
+                    }
+                },
+                {
+                    "match": {
+                        "edited": True
+                    }
+                }
+            ]
+        }
+    }
+    res = es.search(
+        index=indices,
+        query=query,
+        scroll='2m',
+        size=1000
+    )
+    # Get the scroll ID
+    sid = res['_scroll_id']
+    scroll_size = len(res['hits']['hits'])
+    comments = []
+    while scroll_size > 0:
+        "Scrolling..."
+
+        # Before scroll, process current batch of hits
+        ##
+        for item in res['hits']['hits']:
+            comments.append(item)
+
+        data = es.scroll(scroll_id=sid, scroll='2m')
+
+        # Update the scroll ID
+        sid = data['_scroll_id']
+
+        # Get the number of results that returned to the last scroll
+        scroll_size = len(data['hits']['hits'])
+
+    total = len(comments)
+    print(f"total controversial comments: {total}")
 
 
 def query4(es: Elasticsearch):

@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from elasticsearch import Elasticsearch
@@ -6,7 +7,7 @@ from elasticsearch import Elasticsearch
 def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
-    query2(es)
+    query3(es)
 
 
 def query1(es: Elasticsearch):
@@ -46,8 +47,9 @@ def query1(es: Elasticsearch):
                 top_comments.remove(top_comment)
                 top_comments.append(data)
     for top_comment in top_comments:
-        print(f"Score {top_comment['score']} \n comment: {top_comment['body']}")
+        print(f"[COMMENT SCORE] {top_comment['score']}\n[COMMENT]: {top_comment['body']}")
         print(f"=================================")
+        print("\n")
 
 
 def query2(es: Elasticsearch):
@@ -100,6 +102,59 @@ def query2(es: Elasticsearch):
 
     total = len(comments)
     print(f"total controversial comments: {total}")
+
+
+def query3(es: Elasticsearch):
+    """
+    What percentage of the controversial comments were made at night (after 10pm)?
+    :param es: Elastic Search API
+    """
+    indices = list(es.indices.get_alias().keys())
+    query = {
+        "match": {
+            "controversiality": 1
+        }
+    }
+    res = es.search(
+        index=indices,
+        query=query,
+        scroll='2m',
+        size=1000
+    )
+    # Get the scroll ID
+    sid = res['_scroll_id']
+    scroll_size = len(res['hits']['hits'])
+    comments = []
+    while scroll_size > 0:
+        "Scrolling..."
+
+        # Before scroll, process current batch of hits
+        ##
+        for item in res['hits']['hits']:
+            comments.append(item)
+
+        data = es.scroll(scroll_id=sid, scroll='2m')
+
+        # Update the scroll ID
+        sid = data['_scroll_id']
+
+        # Get the number of results that returned to the last scroll
+        scroll_size = len(data['hits']['hits'])
+    total = 0
+    comments_late = []
+    for comment in comments:
+        data = comment['_source']
+        date = datetime.datetime.fromtimestamp(data['created_utc'])
+        if date.hour > 22:
+            total += 1
+            comments_late.append(data)
+    print(f"total controversial comments after 10pm: {total}")
+    for comment in comments_late:
+        date = datetime.datetime.fromtimestamp(comment['created_utc'])
+        print(f"[COMMENT TIME]: {date.time()}\n[COMMENT]: {comment['body']}")
+        print(f"=================================")
+        print("\n")
+
 
 
 def query4(es: Elasticsearch):

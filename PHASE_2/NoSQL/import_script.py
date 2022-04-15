@@ -7,7 +7,7 @@ import requests
 
 
 def main():
-    host = os.environ['connection_uri']
+    host = os.environ.get('connection_uri')
     mypath = "/home/viking/DEV/SOEN-363-Project/DATA"
 
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]

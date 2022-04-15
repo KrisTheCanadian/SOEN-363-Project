@@ -11,7 +11,7 @@ def main():
 
 def query4(es: Elasticsearch):
     """
-    How many of the comments with the word sorry in them are replying to another comment?
+    What is the percentage of comments with the word sorry in them and are also replying to another comment?
     :param es: Elastic Search API
     """
     indices = list(es.indices.get_alias().keys())

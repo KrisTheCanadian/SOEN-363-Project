@@ -8,6 +8,7 @@ def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
     query_number: int = int(input("Enter the query number you want to run: "))
+    print('Result: \n')
     # I wish python had switch cases...
     if query_number == 1:
         query1(es)
@@ -21,6 +22,8 @@ def main():
         query5(es)
     elif query_number == 6:
         query6(es)
+    elif query_number == 7:
+        query7(es)
     else:
         print("Invalid Query Number... Exiting Program...")
 
@@ -290,7 +293,7 @@ def query5(es: Elasticsearch):
 
 def query6(es: Elasticsearch):
     """
-    Find all comments about postgres. Display the number of comments and the top 10 and worst 10 comments.
+    Find all comments about postgres. Display the number of comments that have a score between 15-30. Display the top comment and the lowest comment in that range
     :param es: Elastic Search API
     """
     indices = list(es.indices.get_alias().keys())
@@ -323,26 +326,51 @@ def query6(es: Elasticsearch):
             }
         }
     ]
-
-    aggs = {
-        "comments": {
-            "terms": {
-                "field": "body.keyword",
-                "size": 500
-            }
-        }
-    }
     res = es.search(
         index=indices,
         query=query,
         sort=sort,
-        aggs=aggs,
         size=1000
     )
     comments = res.body["hits"]["hits"]
     print(f"[Total Number of comments]: {len(comments)}")
     print(f"[Top Scored Comment in this range]: {comments[0]['_source']['body']}")
     print(f"[Lowest Scored Comment in this range]: {comments[-1]['_source']['body']}")
+
+
+def query7(es):
+    """
+    Display the number of comments for every subreddit and the top comment score. Order them in popularity.
+    :param es: Elastic Search API
+    """
+    indices = list(es.indices.get_alias().keys())
+    aggs = {
+        "numberOfCommentsPerSubreddit": {
+            "terms": {
+                "field": "subreddit.keyword",
+                "size": 1000
+            },
+            "aggs": {
+                "max_value": {
+                    "max": {
+                        "field": "score",
+                    }
+                }
+            }
+        }
+    }
+
+    res = es.search(
+        index=indices,
+        aggs=aggs,
+        size=1000
+    )
+    results = res.body['aggregations']['numberOfCommentsPerSubreddit']['buckets']
+    for result in results:
+        subreddit = result['key']
+        total_comments = result['doc_count']
+        max_comment_score = result['max_value']['value']
+        print(f"[subreddit]: {subreddit}, [total_comments]: {total_comments}, [top_comment_score]: {max_comment_score}")
 
 
 if __name__ == '__main__':

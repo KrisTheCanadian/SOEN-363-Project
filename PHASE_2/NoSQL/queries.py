@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
-    query3(es)
+    query5(es)
 
 
 def query1(es: Elasticsearch):
@@ -156,7 +156,6 @@ def query3(es: Elasticsearch):
         print("\n")
 
 
-
 def query4(es: Elasticsearch):
     """
     What is the percentage of comments with the word sorry in them and are also replying to another comment?
@@ -209,6 +208,69 @@ def query4(es: Elasticsearch):
         print("{:.{}f}%".format(percentage, 4))
     else:
         print("0%")
+
+
+def query5(es: Elasticsearch):
+    """
+    Who were the top 3 users that commented the most in 2006? How many comments did they make and what was their top commented subreddit?
+    :param es: Elastic Search API
+    """
+    indices: list[str] = list(es.indices.get_alias().keys())
+    for index in indices[:]:
+        if index.find("2007") != -1:
+            indices.remove(index)
+    query = {
+        "match_all": {}
+    }
+
+    aggs = {
+        "authors": {
+            "terms": {
+                "field": "author.keyword",
+            }
+        }
+    }
+
+    res = es.search(
+        index=indices,
+        query=query,
+        aggs=aggs,
+        scroll='2m',
+        size=1000
+    )
+    authors = res.body['aggregations']['authors']['buckets']
+    for author in authors[:4]:
+        if author['key'] == '[deleted]':
+            continue
+        query = {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "author": author['key']
+                        }
+                    }
+                ]
+            }
+        }
+        sort = [
+            {
+                "score": {
+                    "unmapped_type": "keyword",
+                    "order": "desc"
+                }
+            }
+        ]
+        res = es.search(
+            index=indices,
+            query=query,
+            sort=sort,
+            size=1
+        )
+        if res['hits']['hits'][0] is not None:
+            comment = res['hits']['hits'][0]['_source']
+            print(f"[Author]: {author['key']} [Count]: {author['doc_count']} [Score]: {comment['score']} "
+                  f"[SubReddit]: {comment['subreddit']} [Comment]: {comment['body']}")
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ def main():
         query1(es)
     elif query_number == 2:
         query2(es)
-    elif query3(es) == 3:
+    elif query_number == 3:
         query3(es)
     elif query_number == 4:
         query4(es)

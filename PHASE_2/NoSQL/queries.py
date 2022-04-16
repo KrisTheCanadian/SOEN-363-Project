@@ -7,7 +7,7 @@ from elasticsearch import Elasticsearch
 def main():
     host = os.getenv('CONNECTION_STRING')
     es: Elasticsearch = Elasticsearch(hosts=host)
-    query_number = input("Enter the query number you want to run: ")
+    query_number: int = int(input("Enter the query number you want to run: "))
     # I wish python had switch cases...
     if query_number == 1:
         query1(es)

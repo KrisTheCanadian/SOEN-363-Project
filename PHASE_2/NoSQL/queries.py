@@ -24,6 +24,8 @@ def main():
         query6(es)
     elif query_number == 7:
         query7(es)
+    elif query_number == 8:
+        query8(es)
     else:
         print("Invalid Query Number... Exiting Program...")
 
@@ -310,7 +312,6 @@ def query6(es: Elasticsearch):
                         "score": {
                             "gte": 15,
                             "lte": 30,
-                            "boost": 2.0
                         }
                     }
                 }
@@ -371,6 +372,62 @@ def query7(es):
         total_comments = result['doc_count']
         max_comment_score = result['max_value']['value']
         print(f"[subreddit]: {subreddit}, [total_comments]: {total_comments}, [top_comment_score]: {max_comment_score}")
+
+
+def query8(es):
+    """
+    Query every comment between September 2007 and December 2007
+    that either has the word ‘sql’ or ‘nosql’ in the comment.
+    Only include comments which have a score greater than 0.
+    Print the number of comments and print the first 10 results (sorted by score).
+    :param es: Elastic Search API
+    """
+    indices = ['rc_2007-09', 'rc_2007-10', 'rc_2007-11', 'rc_2007-12']
+    query = {
+        "bool": {
+            "must": [
+                {
+                    "bool": {
+                        "should": [
+                            {"term": {"body": "sql"}},
+                            {"term": {"body": "nosql"}},
+                        ]
+                    }
+                },
+                {
+                    "range": {
+                        "score": {
+                            "gte": 1,
+                        }
+                    }
+                }
+            ]
+        }
+    }
+
+    sort = [
+        {
+            "score": {
+                "unmapped_type": "keyword",
+                "order": "desc"
+            }
+        }
+    ]
+
+    res = es.search(
+        index=indices,
+        query=query,
+        sort=sort,
+        size=1000
+    )
+    results = res.body['hits']['hits']
+    print(f"total of {len(results)} were comments that either included sql or nosql")
+    print(f"printing first 10 results:")
+
+    for result in results[:11]:
+        data = result['_source']
+        print(f"\n[Author]: {data['author']}\n[Subreddit]: {data['subreddit']}"
+              f"\n[Score]: {data['score']}\n[Comment]: {data['body']}")
 
 
 if __name__ == '__main__':

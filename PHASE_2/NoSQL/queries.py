@@ -19,6 +19,8 @@ def main():
         query4(es)
     elif query_number == 5:
         query5(es)
+    elif query_number == 6:
+        query6(es)
     else:
         print("Invalid Query Number... Exiting Program...")
 
@@ -284,6 +286,63 @@ def query5(es: Elasticsearch):
             comment = res['hits']['hits'][0]['_source']
             print(f"[Author]: {author['key']} [Count]: {author['doc_count']} [Score]: {comment['score']} "
                   f"[SubReddit]: {comment['subreddit']} [Comment]: {comment['body']}")
+
+
+def query6(es: Elasticsearch):
+    """
+    Find all comments about postgres. Display the number of comments and the top 10 and worst 10 comments.
+    :param es: Elastic Search API
+    """
+    indices = list(es.indices.get_alias().keys())
+    query = {
+        "bool": {
+            "must": [
+                {
+                    "match": {
+                        "body": "postgres"
+                    }
+                },
+                {
+                    "range": {
+                        "score": {
+                            "gte": 15,
+                            "lte": 30,
+                            "boost": 2.0
+                        }
+                    }
+                }
+            ]
+        }
+    }
+
+    sort = [
+        {
+            "score": {
+                "unmapped_type": "keyword",
+                "order": "desc"
+            }
+        }
+    ]
+
+    aggs = {
+        "comments": {
+            "terms": {
+                "field": "body.keyword",
+                "size": 500
+            }
+        }
+    }
+    res = es.search(
+        index=indices,
+        query=query,
+        sort=sort,
+        aggs=aggs,
+        size=1000
+    )
+    comments = res.body["hits"]["hits"]
+    print(f"[Total Number of comments]: {len(comments)}")
+    print(f"[Top Scored Comment in this range]: {comments[0]['_source']['body']}")
+    print(f"[Lowest Scored Comment in this range]: {comments[-1]['_source']['body']}")
 
 
 if __name__ == '__main__':

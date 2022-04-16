@@ -26,6 +26,10 @@ def main():
         query7(es)
     elif query_number == 8:
         query8(es)
+    elif query_number == 9:
+        query9(es)
+    elif query_number == 10:
+        query10(es)
     else:
         print("Invalid Query Number... Exiting Program...")
 
@@ -428,6 +432,130 @@ def query8(es):
         data = result['_source']
         print(f"\n[Author]: {data['author']}\n[Subreddit]: {data['subreddit']}"
               f"\n[Score]: {data['score']}\n[Comment]: {data['body']}")
+
+
+def query9(es):
+    """
+    Find the top comment in January 2007, print it and also display the number of replies this comment got in total.
+    :param es: Elastic Search API
+    """
+    indices = ['rc_2007-01']
+    query = {
+        "query_string": {
+            "query": "*"
+        }
+    }
+
+    sort = [
+        {
+            "score": {
+                "unmapped_type": "keyword",
+                "order": "desc"
+            }
+        }
+    ]
+
+    res = es.search(
+        index=indices,
+        query=query,
+        sort=sort,
+        size=1
+    )
+    top_comment = res.body['hits']['hits'][0]['_source']
+    print(top_comment)
+
+    indices = list(es.indices.get_alias().keys())
+
+    query = {
+        "regexp": {"parent_id": f".*{top_comment['id']}*"}
+    }
+
+    sort = [
+        {
+            "created_utc": {
+                "unmapped_type": "keyword",
+                "order": "desc"
+            }
+        }
+    ]
+
+    res = es.search(
+        index=indices,
+        query=query,
+        sort=sort,
+        size=1000
+    )
+
+    replies = res.body['hits']['hits']
+    print(f"Total Replies: {len(replies)}")
+
+
+def query10(es):
+    """
+    Find all comments that mention at least 2 of the following words: sql, database and programming, software. In 2006. State the number of comments
+    :param es: Elastic Search API
+    """
+    indices: list[str] = list(es.indices.get_alias().keys())
+    for index in indices[:]:
+        if index.find("2007") != -1:
+            indices.remove(index)
+    query = {
+        "bool": {
+            "should": [
+                {
+                    "term": {
+                        "body": "sql"
+                    }
+                },
+                {
+                    "term": {
+                        "body": "database"
+                    }
+                },
+                {
+                    "term": {
+                        "body": "programming"
+                    }
+                },
+                {
+                    "term": {
+                        "body": "software"
+                    }
+                }
+            ],
+            "minimum_should_match": 2
+        }
+    }
+
+    res = es.search(
+        index=indices,
+        query=query,
+        scroll='5m',
+        size=1000
+    )
+    # Get the scroll ID
+    sid = res['_scroll_id']
+    scroll_size = len(res['hits']['hits'])
+    comments = []
+    while scroll_size > 0:
+        "Scrolling..."
+
+        # Before scroll, process current batch of hits
+        ##
+        for item in res['hits']['hits']:
+            comments.append(item)
+
+        data = es.scroll(scroll_id=sid, scroll='5m')
+
+        # Update the scroll ID
+        sid = data['_scroll_id']
+
+        # Get the number of results that returned to the last scroll
+        scroll_size = len(data['hits']['hits'])
+
+    total = len(comments)
+    print(f"total comments that include at least of of the following words: "
+          f"sql, database, programming, software: {total}")
 
 
 if __name__ == '__main__':

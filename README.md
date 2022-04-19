@@ -34,7 +34,7 @@
   <a aria-label="SQL Dataset" href="https://www.kaggle.com/datasets/pepepython/spotify-huge-database-daily-charts-over-3-years?select=Database+to+calculate+popularity.csv">
     <img src="https://img.shields.io/badge/Spotify-1ED760?style=for-the-badge&logo=spotify&logoColor=white">
   </a>
-  <a aria-label="Reddit Dataset" href="https://www.kaggle.com/datasets/siropo/spotify-multigenre-playlists-data)">
+  <a aria-label="Reddit Dataset" href="https://files.pushshift.io/reddit/comments/">
     <img alt="" src="https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white">
   </a>
 </p>
@@ -43,7 +43,7 @@
 
 [**SQL Dataset 2 (Spotify)**](https://www.kaggle.com/datasets/pepepython/spotify-huge-database-daily-charts-over-3-years?select=Database+to+calculate+popularity.csv)
 
-[**NoSQL Dataset (Reddit)**](https://www.kaggle.com/datasets/siropo/spotify-multigenre-playlists-data)
+[**NoSQL Dataset (Reddit)**](https://files.pushshift.io/reddit/comments/)
 
 ## Importing the Data 📁
 

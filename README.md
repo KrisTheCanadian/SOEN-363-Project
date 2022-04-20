@@ -85,7 +85,7 @@ Queries implementation: [here](./PHASE_2/sql/)
   <li>What are all Led Zeppelin song names in rock_Music_data, and on which days do they end up on the popularDataSet in 2018]</li>
   <li>What are all the playlists that those Led Zeppelin songs feature in?</li>
   <li>What were the most popular songs (songs listed in the top 3) of the month of January of 2019 in Canada? Order by popularity and limit output to 10.</li>
-  <li>What is the largest popularity gap per genre (lowest popularity, highest popularity)?</li>
+  <li>What is the largest popularity gap in rock_Music (lowest popularity, highest popularity)?</li>
   <li>Which songs have the most genres (limit to 10 results)?</li>
   <li>Which band shows up the most often?</li>
   <li>Which bands show up in different genre tables?</li>

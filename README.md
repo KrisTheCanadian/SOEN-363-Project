@@ -28,6 +28,8 @@
 
 [**Phase 2 Information (PDF)**](./PHASE_2/SOEN363_Project_Phase2-Winter2022.pdf)
 
+[**Presentation Slides 🖼**](https://www.canva.com/design/DAE9vDpNF9s/HErhMPvXCfrhe7tPx4mHNw/view?utm_content=DAE9vDpNF9s&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
 ## Datasets 📙
 
 <p align="left">

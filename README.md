@@ -81,6 +81,11 @@ Queries implementation: [here](./PHASE_1/sql/)
 ### Phase 2 ✅
 
 **SQL Queries**
+
+***ER Diagram***
+
+<img src="./resources/ER_Diagram.png">
+    
 Queries implementation: [here](./PHASE_2/sql/)
 
 <ol>

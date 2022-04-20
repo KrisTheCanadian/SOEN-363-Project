@@ -1,3 +1,4 @@
+import time
 import datetime
 import os
 
@@ -9,6 +10,7 @@ def main():
     es: Elasticsearch = Elasticsearch(hosts=host)
     query_number: int = int(input("Enter the query number you want to run: "))
     print('Result: \n')
+    startTime = time.perf_counter()
     # I wish python had switch cases...
     if query_number == 1:
         query1(es)
@@ -33,6 +35,8 @@ def main():
     else:
         print("Invalid Query Number... Exiting Program...")
 
+    finishTime = time.perf_counter()
+    print(f"Time Taken: {finishTime- startTime}")
 
 def query1(es: Elasticsearch):
     """

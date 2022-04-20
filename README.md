@@ -95,7 +95,7 @@ Queries implementation: [here](./PHASE_2/sql/)
   <li>What is the largest popularity gap in rock_Music (lowest popularity, highest popularity)?</li>
   <li>Which songs have the most genres (limit to 10 results)?</li>
   <li>Which band shows up the most often in Alternative Music Data? Which of their songs appear in the Popular Dataset, include artist name, title, date and country.</li>
-  <li>Which bands show up in different genre tables?</li>
+  <li>Which Artists appear in both the indie and alternative music data starting by the letter S</li>
   <li>What are some good club music (danceability  > 0.8) listed as pop which artists also make music categorized as blues? Return the pop song and blues song with its respective artist.</li>
   <li>Out of the most popular alternative playlist, list in increasing order the songs above 5 minutes in length. </li>
   <li>How many pop songs released in 2020 that are in the top 20 have a tempo greater than 120?</li>

@@ -89,7 +89,7 @@ Queries implementation: [here](./PHASE_2/sql/)
   <li>What were the most popular songs (songs listed in the top 3) of the month of January of 2019 in Canada? Order by popularity and limit output to 10.</li>
   <li>What is the largest popularity gap in rock_Music (lowest popularity, highest popularity)?</li>
   <li>Which songs have the most genres (limit to 10 results)?</li>
-  <li>Which band shows up the most often?</li>
+  <li>Which band shows up the most often in Alternative Music Data? Which of their songs appear in the Popular Dataset, include artist name, title, date and country.</li>
   <li>Which bands show up in different genre tables?</li>
   <li>What are some good club music (danceability  > 0.8) listed as pop which artists also make music categorized as blues? Return the pop song and blues song with its respective artist.</li>
   <li>Out of the most popular alternative playlist, list in increasing order the songs above 5 minutes in length. </li>
